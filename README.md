@@ -8,9 +8,9 @@ Contents
 
 [3. Cloning a repository](#3)
 
-[4. Building Docker images ](#4)
+[4. Docker images ](#4)
 
-
+[5. Docker containers ](#5)
 
 ============================================================================================
 
@@ -54,7 +54,6 @@ Try to run docker commands without sudo.
 ```sh
 docker run hello-world
 ```
-
 ![d3](https://raw.githubusercontent.com/vottri/Docker/main/images/d3.png)
 
 ## 3. Cloning a repository <a name="3"></a>
@@ -102,7 +101,7 @@ Go back to your Linux machine. Navigate to the location where you want to put yo
 Type **git clone**, and then paste the URL you just copied. Add **your github username** and the copied **personal access token** to the command according to the following structure:
 
 ```sh
-git clone https://[your-github-username]:[personal_access_token]@github.com/your-github-username/your-repository.git
+git clone https://your-github-username:personal-access-token@github.com/your-github-username/your-repository.git
 ```
 
 Moreover, to clone a specific branch of the remote repository on Github, you might want to add the following option.
@@ -111,7 +110,7 @@ Moreover, to clone a specific branch of the remote repository on Github, you mig
 git clone -b <branch> <remote_repository_url>
 ```
 
-I just cloned the **dev** branch of the repository I want on Github account back to the Linux machine.
+I just cloned the **dev** branch of the repository I want on my Github account back to the Linux machine.
 
 ![d6](https://raw.githubusercontent.com/vottri/Docker/main/images/d6.png)
 
@@ -154,11 +153,21 @@ web app and web api will be dev setup docker file.
 
 
 
-## 4. Building Docker images <a name="4"></a>
+## 4. Docker images <a name="4"></a>
 
-cd DevOpsRepo/
+Go inside the local git repository that you just cloned.
 
-build web app image
+![d7](https://raw.githubusercontent.com/vottri/Docker/main/images/d7.png)
+
+The developers have already set up dockerfiles for the web app and web api. 
+
+![d8](https://raw.githubusercontent.com/vottri/Docker/main/images/d8.png)
+
+![d9](https://raw.githubusercontent.com/vottri/Docker/main/images/d9.png)
+
+We are going to build the images using those dockerfiles.
+
+### Build web app image
 
 ```sh
 docker build -f ./DevOpsWeb/Dockerfile -t devopsweb:1.0 .
@@ -168,29 +177,64 @@ docker build -f ./DevOpsWeb/Dockerfile -t devopsweb:1.0 .
 
  + **-t**, **(--tag)** lets you tag the image (The image name will be **devopsweb** and the tag will be **1.0**).
 
-build web api image
+![d10](https://raw.githubusercontent.com/vottri/Docker/main/images/d10.png)
+
+### Build web api image
 
 ```sh
 docker build -f ./DevOpsWeb.WebApi/Dockerfile -t devopsweb-api:1.0 .
 ```
 
-https://hub.docker.com/_/microsoft-mssql-server/  Docker images for Microsoft SQL Server based on Ubuntu
+![d11-1](https://raw.githubusercontent.com/vottri/Docker/main/images/d11-1.png)
 
-```sh
+### Pull database image
+
+The developers didn't provide source code or any dockerfile for building the database image. 
+
+We need to pull pre-built Docker image for Microsoft SQL Server based on Ubuntu back to the Linux machine.
+
+Docker Hub provides a lot of container images for Microsoft SQL Server on Linux at https://hub.docker.com/_/microsoft-mssql-server/. You can go through the list to search for the image you want.
+ 
+When you are ready, pull the image back to your Linux machine
+
+```sh 
 docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
 ```
+ + **docker pull [image-name]:[tag]**
+
+![d12](https://raw.githubusercontent.com/vottri/Docker/main/images/d12.png)
+
+You now can list the images you have on your machine.
+ 
+```sh
+docker image ls
+```
+
+![d13](https://raw.githubusercontent.com/vottri/Docker/main/images/d13.png)
+
+
+Remove unused images for efficiency's sake (optional).
 
 ```sh
 docker image prune -f
 ```
 
+## 5. Docker containers <a name="4"></a>
+
+Start a container from the Microsoft SQL Server image you pulled.
+
 ```sh
-docker image ls
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" -p 1433:1433 --name mssql-server -d mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
 ```
 
-docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" -p 1433:1433 --name mssql-server -d mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+![d14](https://raw.githubusercontent.com/vottri/Docker/main/images/d14.png)
 
+```sh
 docker container ls
+```
+
+![d15](https://raw.githubusercontent.com/vottri/Docker/main/images/d15.png)
+
 
 ip addr
 
@@ -198,12 +242,25 @@ ip addr
 docker run -e 'ConnectionStrings__AppDatabase=Server=10.0.0.4,1433;Database=AppDatabase;User Id=sa;Password=zaQ@123456!;' --name devopsweb-api-1 -p 10005:80 -d devopsweb-api:1.0
 ```
 
-docker run -e 'ConnectionStrings__AppDatabase=Server=10.0.0.4,1433;Database=AppDatabase;User Id=sa;Password=zaQ@123456!;' --name devopsweb-api-1 -p 10005:80 -d devopsweb-api:1.0
+![d16-1](https://raw.githubusercontent.com/vottri/Docker/main/images/d16-1.png)
 
+```sh
+docker container ls
+```
 
+![d17](https://raw.githubusercontent.com/vottri/Docker/main/images/d17.png)
 
+```sh
 docker run -e 'WebApi=http://10.0.0.4:10005' --name devopsweb1 -p 10000:80 -d devopsweb:1.0
+```
 
+![d18](https://raw.githubusercontent.com/vottri/Docker/main/images/d18.png)
+
+```sh
+docker container ls
+```
+
+![d19](https://raw.githubusercontent.com/vottri/Docker/main/images/d19.png)
 
 FROM mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04 AS base
 
@@ -238,3 +295,16 @@ docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
 
 
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d customdb:1.0
+
+
+
+
+
+
+
+
+
+
+
+
+
