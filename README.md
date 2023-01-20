@@ -164,14 +164,21 @@ build web app image
 docker build -f ./DevOpsWeb/Dockerfile -t devopsweb:1.0 .
 ```
 
+ + **-f**, **(--file)** lets you specify the path to the Dockerfile (The above command will use the current directory as the build context and read a Dockerfile from **./DevOpsWeb/**).
+
+ + **-t**, **(--tag)** lets you tag the image (The image name will be **devopsweb** and the tag will be **1.0**).
+
 build web api image
 
 ```sh
 docker build -f ./DevOpsWeb.WebApi/Dockerfile -t devopsweb-api:1.0 .
 ```
 
-docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+https://hub.docker.com/_/microsoft-mssql-server/  Docker images for Microsoft SQL Server based on Ubuntu
 
+```sh
+docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
+```
 
 ```sh
 docker image prune -f
