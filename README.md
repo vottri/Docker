@@ -12,6 +12,10 @@ Contents
 
 [5. Docker containers ](#5)
 
+[6. Dockerfile ](#6)
+
+[7. Dockercompose ](#7)
+
 ============================================================================================
 
 ## 1. Lab Setup <a name="1"></a>
@@ -173,9 +177,9 @@ We are going to build the images using those dockerfiles.
 docker build -f ./DevOpsWeb/Dockerfile -t devopsweb:1.0 .
 ```
 
- + **-f**, **(--file)** lets you specify the path to the Dockerfile (The above command will use the current directory as the build context and read a Dockerfile from **./DevOpsWeb/**).
+ + **-f**: lets you specify the path to the Dockerfile (The above command will use the current directory as the build context and read a Dockerfile from **./DevOpsWeb/**).
 
- + **-t**, **(--tag)** lets you tag the image (The image name will be **devopsweb** and the tag will be **1.0**).
+ + **-t**: lets you tag the image (The image name will be **devopsweb** and the tag will be **1.0**).
 
 ![d10](https://raw.githubusercontent.com/vottri/Docker/main/images/d10.png)
 
@@ -219,22 +223,35 @@ Remove unused images for efficiency's sake (optional).
 docker image prune -f
 ```
 
-## 5. Docker containers <a name="4"></a>
+## 5. Docker containers <a name="5"></a>
 
-Start a container from the Microsoft SQL Server image you pulled.
+Start a container from the mssql image you pulled.
 
 ```sh
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" -p 1433:1433 --name mssql-server -d mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
 ```
 
+ + **-e**: lets you set environment variables in the container you’re running.
+
+ + **--name**: lets you assign a name to the container (with "mssql-server" being the name in this case).
+
+ + **-p [host-port]:[container-port]**: lets you publish a container's port(s) to the host (-p 1433:1433 map port 1433 from the host (your Linux machine) to port 1433 on docker container).
+
+ + **-d**: lets you run containers in the background.
+
 ![d14](https://raw.githubusercontent.com/vottri/Docker/main/images/d14.png)
 
+List the running containers by using these command.
+
 ```sh
-docker container ls
+docker container ls 
+
+docker ps
 ```
 
 ![d15](https://raw.githubusercontent.com/vottri/Docker/main/images/d15.png)
 
+Start web api container
 
 ip addr
 
@@ -244,11 +261,11 @@ docker run -e 'ConnectionStrings__AppDatabase=Server=10.0.0.4,1433;Database=AppD
 
 ![d16-1](https://raw.githubusercontent.com/vottri/Docker/main/images/d16-1.png)
 
-```sh
-docker container ls
-```
+Verify that web api container is running.
 
 ![d17](https://raw.githubusercontent.com/vottri/Docker/main/images/d17.png)
+
+Start web app container
 
 ```sh
 docker run -e 'WebApi=http://10.0.0.4:10005' --name devopsweb1 -p 10000:80 -d devopsweb:1.0
@@ -256,12 +273,19 @@ docker run -e 'WebApi=http://10.0.0.4:10005' --name devopsweb1 -p 10000:80 -d de
 
 ![d18](https://raw.githubusercontent.com/vottri/Docker/main/images/d18.png)
 
-```sh
-docker container ls
-```
+Verify that web app container is also running.
 
 ![d19](https://raw.githubusercontent.com/vottri/Docker/main/images/d19.png)
 
+## 6. Dockerfile <a name="6"></a>
+
+Create a dockerfile for building the custom database image.
+
+![d20](https://raw.githubusercontent.com/vottri/Docker/main/images/d20.png)
+
+Fill the dockerfile with these contents.
+
+```sh
 FROM mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04 AS base
 
 WORKDIR /database
@@ -276,35 +300,147 @@ COPY /CustomDB/script.sh .
 CMD ["/bin/bash","-c","./script.sh"]
 
 USER mssql
+```
 
+Create a script file that will run when the custom database container starts running.
 
+![d21](https://raw.githubusercontent.com/vottri/Docker/main/images/d21.png)
 
-
+```sh
 #!/bin/bash
 
 /database/node_exporter-1.5.0.linux-amd64/node_exporter & \
 /opt/mssql/bin/sqlservr
+```
 
-chmod 775 script.sh
+Build the custom database image.
 
+![d22](https://raw.githubusercontent.com/vottri/Docker/main/images/d22.png)
 
+```sh
 docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
+```
+
+![d23](https://raw.githubusercontent.com/vottri/Docker/main/images/d23.png)
+![d24](https://raw.githubusercontent.com/vottri/Docker/main/images/d24.png)
 
 
 
+![d25](https://raw.githubusercontent.com/vottri/Docker/main/images/d25.png)
+
+```sh
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssql-server/data:/var/opt/mssql/data customdb:1.0
+```
+
+docker container rm customdb1 -f
+customdb1
+cloud_user@ub01:~$ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssql-server/data:/var/opt/mssql/data customdb:1.0
+
+cloud_user@ub01:~$ ls -la mssql-server/data/
 
 
-docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d customdb:1.0
+## 7. Dockercompose <a name="7"></a>
+
+
+cloud_user@ub01:~$ cd DevOpsRepo/
+cloud_user@ub01:~/DevOpsRepo$
+
+cloud_user@ub01:~/DevOpsRepo$ nano docker-compose.yml
 
 
 
+cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
+
+
+cloud_user@ub01:~/DevOpsRepo$ docker compose down
+
+
+cloud_user@ub01:~/DevOpsRepo$ nano docker-compose.yml
+
+
+cloud_user@ub01:~/DevOpsRepo$ docker compose up
+
+
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ ls
+DevOpsWeb.csproj  Pages       Properties  appsettings.Development.json  wwwroot
+Dockerfile        Program.cs  Startup.cs  appsettings.json
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ cd Pages/
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ ls
+Error.cshtml     Index.cshtml     Privacy.cshtml     Shared               _ViewStart.cshtml
+Error.cshtml.cs  Index.cshtml.cs  Privacy.cshtml.cs  _ViewImports.cshtml
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ nano Index.cshtml
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ cd ..
+cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ cd ..
+cloud_user@ub01:~/DevOpsRepo$
+cloud_user@ub01:~/DevOpsRepo$
+cloud_user@ub01:~/DevOpsRepo$
+cloud_user@ub01:~/DevOpsRepo$
+cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
+
+
+cloud_user@ub01:~/DevOpsRepo$ docker compose down
+
+
+cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
+
+cloud_user@ub01:~/DevOpsRepo$ docker compose build devops-web
+
+
+cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
 
 
 
+version: "3.8"
 
+services:
+  devops-web:
+    image: devops-web:web-1.0
+    build:
+      context: .
+      dockerfile: DevOpsWeb/Dockerfile
+    ports:
+      - target: 80
+        published: 10000
+      - target: 443
+        published: 10001
+    environment:
+      - WebApi=http://devops-api
+    depends_on:
+      - devops-db
+      - devops-api
 
+  devops-api:
+    image: devops-web:api-1.0
+    build:
+      context: .
+      dockerfile: DevOpsWeb.WebApi/Dockerfile
+    ports:
+      - target: 80
+        published: 10005
+    environment:
+      - ConnectionStrings__AppDatabase=Server=devops-db;Database=AppDatabase;User Id=sa;Password=zaQ@123456!;
+    depends_on:
+      - devops-db
 
+  devops-db:
+    image: customdb1:1.0
+    build:
+      context: .
+      dockerfile: ./SqlDockerfile.txt
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=zaQ@123456!
+      - MSSQL_PID=Express
+    ports:
+      - target: 1433
+        published: 1434
+      - target: 9100
+        published: 9100
+    volumes:
+      - /home/cloud_user/mssql-server/data:/var/opt/mssql/data
 
-
-
-
+networks:
+  default:
+    name: devops-shared-network
