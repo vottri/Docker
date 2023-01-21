@@ -365,18 +365,12 @@ cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ ls
 DevOpsWeb.csproj  Pages       Properties  appsettings.Development.json  wwwroot
 Dockerfile        Program.cs  Startup.cs  appsettings.json
 cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ cd Pages/
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ ls
-Error.cshtml     Index.cshtml     Privacy.cshtml     Shared               _ViewStart.cshtml
-Error.cshtml.cs  Index.cshtml.cs  Privacy.cshtml.cs  _ViewImports.cshtml
 cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ nano Index.cshtml
 cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ cd ..
 cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ cd ..
 cloud_user@ub01:~/DevOpsRepo$
-cloud_user@ub01:~/DevOpsRepo$
-cloud_user@ub01:~/DevOpsRepo$
-cloud_user@ub01:~/DevOpsRepo$
+
+
 cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
 
 
