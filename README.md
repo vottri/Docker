@@ -328,8 +328,13 @@ docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
 
 ![d25](https://raw.githubusercontent.com/vottri/Docker/main/images/d25.png)
 
+
+cloud_user@ub01:~$ mkdir -p mssqlvolume/data
+cloud_user@ub01:~$
+cloud_user@ub01:~$ chown -R 10001 mssqlvolume/
+
 ```sh
-docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssql-server/data:/var/opt/mssql/data customdb:1.0
+docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssqlvolume/data:/var/opt/mssql/data customdb:1.0
 ```
 
 docker container rm customdb1 -f
@@ -385,7 +390,7 @@ cloud_user@ub01:~/DevOpsRepo$ docker compose build devops-web
 cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
 
 
-
+```sh
 version: "3.8"
 
 services:
@@ -438,3 +443,4 @@ services:
 networks:
   default:
     name: devops-shared-network
+```
