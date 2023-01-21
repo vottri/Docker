@@ -324,71 +324,42 @@ docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
 ![d23](https://raw.githubusercontent.com/vottri/Docker/main/images/d23.png)
 ![d24](https://raw.githubusercontent.com/vottri/Docker/main/images/d24.png)
 
-
+Verify the image after the build.
 
 ![d25](https://raw.githubusercontent.com/vottri/Docker/main/images/d25.png)
 
+Create a volume
 
-cloud_user@ub01:~$ mkdir -p mssqlvolume/data
-cloud_user@ub01:~$
-cloud_user@ub01:~$ chown -R 10001 mssqlvolume/
+```sh
+mkdir -p mssqlvolume/data
+sudo chown -R 10001 mssqlvolume/
+```
+
+Start the custom database container.
 
 ```sh
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssqlvolume/data:/var/opt/mssql/data customdb:1.0
 ```
 
-docker container rm customdb1 -f
-customdb1
-cloud_user@ub01:~$ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssql-server/data:/var/opt/mssql/data customdb:1.0
+![d27](https://raw.githubusercontent.com/vottri/Docker/main/images/d27.png)
 
-cloud_user@ub01:~$ ls -la mssql-server/data/
+
+![d28](https://raw.githubusercontent.com/vottri/Docker/main/images/d28.png)
+
+ls -la mssql-server/data/
+
+Microsoft SQL Server Management Studio 
+
+docker container stop customdb1 
+
+docker container rm customdb1
 
 
 ## 7. Dockercompose <a name="7"></a>
 
+cd DevOpsRepo/
 
-cloud_user@ub01:~$ cd DevOpsRepo/
-cloud_user@ub01:~/DevOpsRepo$
-
-cloud_user@ub01:~/DevOpsRepo$ nano docker-compose.yml
-
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose down
-
-
-cloud_user@ub01:~/DevOpsRepo$ nano docker-compose.yml
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose up
-
-
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ ls
-DevOpsWeb.csproj  Pages       Properties  appsettings.Development.json  wwwroot
-Dockerfile        Program.cs  Startup.cs  appsettings.json
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ cd Pages/
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ nano Index.cshtml
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb/Pages$ cd ..
-cloud_user@ub01:~/DevOpsRepo/DevOpsWeb$ cd ..
-cloud_user@ub01:~/DevOpsRepo$
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose down
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose build devops-web
-
-
-cloud_user@ub01:~/DevOpsRepo$ docker compose up -d
-
+nano docker-compose.yml
 
 ```sh
 version: "3.8"
@@ -444,3 +415,31 @@ networks:
   default:
     name: devops-shared-network
 ```
+
+```sh
+docker compose up -d
+```
+
+![d30](https://raw.githubusercontent.com/vottri/Docker/main/images/d30.png)
+
+![d31](https://raw.githubusercontent.com/vottri/Docker/main/images/d31.png)
+
+```sh
+docker compose down
+```
+
+![d32](https://raw.githubusercontent.com/vottri/Docker/main/images/d32.png)
+
+![d33](https://raw.githubusercontent.com/vottri/Docker/main/images/d33.png)
+
+![d34](https://raw.githubusercontent.com/vottri/Docker/main/images/d34.png)
+
+```sh
+docker compose build devops-web
+```
+
+![d35](https://raw.githubusercontent.com/vottri/Docker/main/images/d35.png)
+
+![d36](https://raw.githubusercontent.com/vottri/Docker/main/images/d36.png)
+
+![d37](https://raw.githubusercontent.com/vottri/Docker/main/images/d37.png)
