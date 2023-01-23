@@ -1,4 +1,4 @@
-============================================================================================
+==============================================================================
 
 Contents
 
@@ -265,7 +265,7 @@ Verify that web api container is running.
 
 ![d17](https://raw.githubusercontent.com/vottri/Docker/main/images/d17.png)
 
-Start web app container
+Start web app container.
 
 ```sh
 docker run -e 'WebApi=http://10.0.0.4:10005' --name devopsweb1 -p 10000:80 -d devopsweb:1.0
@@ -292,6 +292,8 @@ WORKDIR /database
 
 USER root
 
+# Download node exporter and extract it.
+
 RUN wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz \
         && tar xvfz node_exporter-1.5.0.linux-amd64.tar.gz
 
@@ -308,6 +310,8 @@ Create a script file that will run when the custom database container starts run
 
 ```sh
 #!/bin/bash
+
+# Run node exporter and start the SQL Server when we run the custom database container.
 
 /database/node_exporter-1.5.0.linux-amd64/node_exporter & \
 /opt/mssql/bin/sqlservr
@@ -328,7 +332,19 @@ Verify the image after the build.
 
 ![d25](https://raw.githubusercontent.com/vottri/Docker/main/images/d25.png)
 
-Create a volume
+Attach a volume to the custom database container.
+
+Volumes are the recommended way to persist data in containers. Persistent data is the data you need to keep. Things like: customer records, financial data, audit logs, ...
+
+Basically:
+
+ - You create a volume, then you create a container and mount the volume into it. 
+
+ - The volume is mounted into a directory in the container’s filesystem, and anything written to that directory is stored inside the volume. 
+ 
+ - If you delete the container, the volume and its data still exist.
+
+Create a directory on your Linux machine so you can mount it to the container later. And to prevent permission denied error, change its permission:
 
 ```sh
 mkdir -p mssqlvolume/data
@@ -341,18 +357,27 @@ Start the custom database container.
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssqlvolume/data:/var/opt/mssql/data customdb:1.0
 ```
 
+ + **-v [host directory]:[the path where the directory are mounted in the container]**: lets you mount host-directories in a container.
+ 
 ![d27](https://raw.githubusercontent.com/vottri/Docker/main/images/d27.png)
 
+Verify that the container is running.
 
 ![d28](https://raw.githubusercontent.com/vottri/Docker/main/images/d28.png)
 
-ls -la mssql-server/data/
+
 
 Microsoft SQL Server Management Studio 
 
 docker container stop customdb1 
 
 docker container rm customdb1
+
+Check the volume again.
+
+ls -la mssqlvolume/data
+
+Start the custom datatbase with a different name but attach the same volume.
 
 
 ## 7. Dockercompose <a name="7"></a>
@@ -395,10 +420,10 @@ services:
       - devops-db
 
   devops-db:
-    image: customdb1:1.0
+    image: devops-web:db-1.0
     build:
       context: .
-      dockerfile: ./SqlDockerfile.txt
+      dockerfile: CustomDB/Dockerfile
     environment:
       - ACCEPT_EULA=Y
       - SA_PASSWORD=zaQ@123456!
@@ -409,7 +434,7 @@ services:
       - target: 9100
         published: 9100
     volumes:
-      - /home/cloud_user/mssql-server/data:/var/opt/mssql/data
+      - /home/cloud_user/mssqlvolume/data:/var/opt/mssql/data
 
 networks:
   default:
@@ -419,10 +444,34 @@ networks:
 ```sh
 docker compose up -d
 ```
-
+ + **-d**: lets you bring those app up in the background.
+ 
 ![d30](https://raw.githubusercontent.com/vottri/Docker/main/images/d30.png)
 
+Now that the apps are built and running, we can use normal docker commands to view the images, containers, networks, and volumes that Docker Compose created.
+
+```sh
+docker image ls
+```
+
+```sh
+docker container ls
+```
+
 ![d31](https://raw.githubusercontent.com/vottri/Docker/main/images/d31.png)
+
+
+```sh
+docker network ls
+```
+
+```sh
+docker volume ls
+```
+
+Now, with the web app successfully deployed, you can visit a web browser and access your website at port 10000 to check its content.
+
+As the applications are already up, but now you want to bring them down. It is quite simple. To do that, just replace the **up**  with **down** and let Docker Compose handles the rest.
 
 ```sh
 docker compose down
@@ -430,15 +479,23 @@ docker compose down
 
 ![d32](https://raw.githubusercontent.com/vottri/Docker/main/images/d32.png)
 
+You can check image and container again.
+
+
 ![d33](https://raw.githubusercontent.com/vottri/Docker/main/images/d33.png)
+
+Try and modify come contents of the file.
 
 ![d34](https://raw.githubusercontent.com/vottri/Docker/main/images/d34.png)
 
+Only build the wep application again.
 ```sh
 docker compose build devops-web
 ```
 
 ![d35](https://raw.githubusercontent.com/vottri/Docker/main/images/d35.png)
+
+Now run docker compose up once more time to bring the web app up.
 
 ![d36](https://raw.githubusercontent.com/vottri/Docker/main/images/d36.png)
 
