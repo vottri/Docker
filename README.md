@@ -308,18 +308,22 @@ Create a script file that will run when the custom database container starts run
 
 ![d21](https://raw.githubusercontent.com/vottri/Docker/main/images/d21.png)
 
+Add these contents to the file.
+
 ```sh
 #!/bin/bash
 
-# Run node exporter and start the SQL Server when we run the custom database container.
+# Run node exporter and launch the SQL Server when we start the custom database container.
 
 /database/node_exporter-1.5.0.linux-amd64/node_exporter & \
 /opt/mssql/bin/sqlservr
 ```
 
-Build the custom database image.
+Change permission for the **script.sh** file.
 
 ![d22](https://raw.githubusercontent.com/vottri/Docker/main/images/d22.png)
+
+Build the custom database image.
 
 ```sh
 docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
