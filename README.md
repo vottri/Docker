@@ -20,6 +20,18 @@ Contents
 
 ## 1. Lab Setup <a name="1"></a>
 
+Create Azure Linux VM with OS image of **Ubuntu Server 20.04 LTS**. I am going to name this VM **ub01** You can choose the name of VM as you want. 
+
+![lab1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab1.png)
+
+Allow your VM's port 22 (SSH) to be accessible from the Internet.
+
+![lab2](https://raw.githubusercontent.com/vottri/Docker/main/images/lab2.png)
+
+For connecting to Linux Virtual Machine, we are going to use **PuTTY**. Enter your Linux machine's public IP address in Host Name and Port will be 22 and click on **Open** button to connect.
+
+![lab3](https://raw.githubusercontent.com/vottri/Docker/main/images/lab3.png)
+
 Update your system. 
 
 ```sh
@@ -507,13 +519,7 @@ Now run docker compose up once more time to bring the web app up.
 
 
 
-![lab1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab1.png)
 
-
-![lab2](https://raw.githubusercontent.com/vottri/Docker/main/images/lab2.png)
-
-
-![lab3](https://raw.githubusercontent.com/vottri/Docker/main/images/lab3.png)
 
 
 ![lab4](https://raw.githubusercontent.com/vottri/Docker/main/images/lab4.png)
