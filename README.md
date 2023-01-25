@@ -1,6 +1,6 @@
-==============================================================================
+===========================================================================
 
-Contents
+**CONTENTS**
 
 [1. Lab Setup](#1)
 
@@ -16,26 +16,82 @@ Contents
 
 [7. Dockercompose ](#7)
 
-============================================================================================
+===========================================================================
 
+**INTRODUCTION**
+
+
+===========================================================================
+
+**DESCRIPTION OF TASKS**
+
+This is intended to help get your feet wet with the basics of Docker by presenting a number of tasks.
+
+Basically, the tasks for you is to build Docker containers:
+
+1 database container database 
+
+database sqlserver 2019 ubuntu 
+
+sa password: zaQ@123456! 
+
+version: express
+
+has installed node exporter and will automatically run when starting the container
+
+The database container must have a volume to store data for backup.
+
+web map port 80 (container) - 10000 (host) api run port 80 (container) - 10005 (host) database port 1433 (container) - 1434 (host)
+
+1 web app container that connects to the database
+
+web app UI needs variable WebApi={ApiUrl}
+
+1 web api 
+
+web api needs to configure connection string to connect to database
+
+ConnectionStrings__AppDatabase=Server={serverIp};Database=AppDatabase;User Id={user};Password={Password};
+
+
+
+first use docker command normally, then put in docker compose
+
+
+web app and web api will be dev setup docker file.
+
+
+===========================================================================
 ## 1. Lab Setup <a name="1"></a>
 
 Create Azure Linux VM with OS image of **Ubuntu Server 20.04 LTS**. I am going to name this VM **ub01** You can choose the name of VM as you want. 
 
 ![lab1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab1.png)
 
-Allow your VM's port 22 (SSH) to be accessible from the Internet.
+Allow your VM's port **22** (SSH) to be accessible from the Internet.
 
 ![lab2](https://raw.githubusercontent.com/vottri/Docker/main/images/lab2.png)
 
-For connecting to Linux Virtual Machine, we are going to use **PuTTY**. Enter your Linux machine's public IP address in Host Name and Port will be 22 and click on **Open** button to connect.
+Use **PuTTY** for connecting to the Linux Virtual Machine. Enter your Linux machine's public IP address in Host Name and Port will be 22. Click on **Open** button to connect.
 
 ![lab3](https://raw.githubusercontent.com/vottri/Docker/main/images/lab3.png)
+
+When you are inside the Linux VMs:
+
+![lab3-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab3-1.png)
+
+Check for working Internet connection.
 
 Update your system. 
 
 ```sh
 sudo apt-get update
+```
+
+Install some required packages:
+
+```sh
+sudo apt-get install -y wget apt-transport-https
 ```
 
 ## 2. Installing Docker Engine on Linux machine <a name="2"></a>
@@ -130,45 +186,6 @@ I just cloned the **dev** branch of the repository I want on my Github account b
 
 ![d6](https://raw.githubusercontent.com/vottri/Docker/main/images/d6.png)
 
-
-
-
-Build Docker containers:
-
-1 web app that connects to the database
-
-web app UI needs variable WebApi={ApiUrl}
-
-1 web api 
-
-web api needs to configure connection string to connect to database
-
-ConnectionStrings__AppDatabase=Server={serverIp};Database=AppDatabase;User Id={user};Password={Password};
-
-
-1 database container database 
-
-database sqlserver 2019 ubuntu 
-
-sa password: zaQ@123456! 
-
-version: express
-
-has installed node exporter and will automatically run when starting the container
-
-After the container starts, there is an automatic script to download a file on the internet.
-
-The database container must have a volume to store data for backup.
-
-web map port 80 (container) - 10000 (host) api run port 80 (container) - 10005 (host) database port 1433 (container) - 1434 (host)
-
-first use docker command normally, then put in docker compose
-
-
-web app and web api will be dev setup docker file.
-
-
-
 ## 4. Docker images <a name="4"></a>
 
 Go inside the local git repository that you just cloned.
@@ -220,19 +237,16 @@ docker pull mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
 
 ![d12](https://raw.githubusercontent.com/vottri/Docker/main/images/d12.png)
 
-You now can list the images you have on your machine.
- 
-```sh
-docker image ls
-```
-
-![d13](https://raw.githubusercontent.com/vottri/Docker/main/images/d13.png)
-
-
 Remove unused images for efficiency's sake (optional).
 
 ```sh
 docker image prune -f
+```
+
+You now can list the images you have on your machine.
+ 
+```sh
+docker image ls
 ```
 
 ## 5. Docker containers <a name="5"></a>
@@ -289,9 +303,51 @@ Verify that web app container is also running.
 
 ![d19](https://raw.githubusercontent.com/vottri/Docker/main/images/d19.png)
 
+![d13](https://raw.githubusercontent.com/vottri/Docker/main/images/d13.png)
+
+Inside **Inbound port rules**, add another rule that allow the VM's port **1433** to be access over the Internet.
+
+![lab4](https://raw.githubusercontent.com/vottri/Docker/main/images/lab4.png)
+
+Use **SQL Server Management Studio (SSMS)** to connect to the mssql-server container on your Linux machine. 
+
+Note: You will need to install SSMS on your own computer. Follow these steps to accomplish that:
+
+ - Go to this link: https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver16&tabs=command-line and click on **Download SQL Server Management Studio** for SSMS download. 
+
+ - Once downloaded we will get a .exe file named as **SSMS-Setup-ENU.exe**. Double click on it.
+
+ - Click on **Install** button to install **SQL Server Management Studio (SSMS)** on your system. Just wait for it to finish installing.
+ 
+Once you are done with download and setup. Open **SQL Server Management Studio** and it will let you connect to a Microsoft Sql Server if you provide it with appropriate informations.
+
+![lab5](https://raw.githubusercontent.com/vottri/Docker/main/images/lab5.png)
+
+This is a sample table inside a sample database for learning purpose.
+
+![lab6](https://raw.githubusercontent.com/vottri/Docker/main/images/lab6.png)
+
+Inside **Inbound port rules**, add another rule that allow the VM's port **10000** and **10005** to be access over the Internet.
+
+![lab7](https://raw.githubusercontent.com/vottri/Docker/main/images/lab7.png)
+
+Access your VM's Public IP Address over port **10005** to check for connection toward web api container.
+
+![lab8](https://raw.githubusercontent.com/vottri/Docker/main/images/lab8.png)
+
+![lab9](https://raw.githubusercontent.com/vottri/Docker/main/images/lab9.png)
+
+Access your VM's Public IP Address over port **10000** to check for connection toward web app container.
+
+![lab10](https://raw.githubusercontent.com/vottri/Docker/main/images/lab10.png)
+
 ## 6. Dockerfile <a name="6"></a>
 
 Create a dockerfile for building the custom database image.
+
+```sh
+nano Dockerfile
+```
 
 ![d20](https://raw.githubusercontent.com/vottri/Docker/main/images/d20.png)
 
@@ -317,6 +373,10 @@ USER mssql
 ```
 
 Create a script file that will run when the custom database container starts running.
+
+```sh
+nano script.sh
+```
 
 ![d21](https://raw.githubusercontent.com/vottri/Docker/main/images/d21.png)
 
@@ -381,6 +441,23 @@ Verify that the container is running.
 
 ![d28](https://raw.githubusercontent.com/vottri/Docker/main/images/d28.png)
 
+Inside **Inbound port rules**, add another rule that allow the VM's port **1434** and **9100** to be access over the Internet.
+
+![lab11](https://raw.githubusercontent.com/vottri/Docker/main/images/lab11.png)
+
+You can check if node exporter is running or not by accessing VM's Public IP Address over port **9100**.
+
+![lab12](https://raw.githubusercontent.com/vottri/Docker/main/images/lab12.png)
+
+Use **SQL Server Management Studio (SSMS)** to connect to your customdb1 container (this time over port 1434).
+
+![lab13](https://raw.githubusercontent.com/vottri/Docker/main/images/lab13.png)
+
+Create a Test database.
+
+![lab14](https://raw.githubusercontent.com/vottri/Docker/main/images/lab14.png)
+
+![lab15](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15.png)
 
 
 Microsoft SQL Server Management Studio 
@@ -487,6 +564,12 @@ docker volume ls
 
 Now, with the web app successfully deployed, you can visit a web browser and access your website at port 10000 to check its content.
 
+![lab10-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab10-1.png)
+
+![lab12](https://raw.githubusercontent.com/vottri/Docker/main/images/lab12.png)
+
+![lab16](https://raw.githubusercontent.com/vottri/Docker/main/images/lab16.png)
+
 As the applications are already up, but now you want to bring them down. It is quite simple. To do that, just replace the **up**  with **down** and let Docker Compose handles the rest.
 
 ```sh
@@ -522,39 +605,9 @@ Now run docker compose up once more time to bring the web app up.
 
 
 
-![lab4](https://raw.githubusercontent.com/vottri/Docker/main/images/lab4.png)
-
-![lab5](https://raw.githubusercontent.com/vottri/Docker/main/images/lab5.png)
-
-
-![lab6](https://raw.githubusercontent.com/vottri/Docker/main/images/lab6.png)
-
-
-![lab7](https://raw.githubusercontent.com/vottri/Docker/main/images/lab7.png)
-
-![lab8](https://raw.githubusercontent.com/vottri/Docker/main/images/lab8.png)
-
-![lab9](https://raw.githubusercontent.com/vottri/Docker/main/images/lab9.png)
-
-
-![lab10](https://raw.githubusercontent.com/vottri/Docker/main/images/lab10.png)
-
-
-![lab11](https://raw.githubusercontent.com/vottri/Docker/main/images/lab11.png)
-
-
-![lab12](https://raw.githubusercontent.com/vottri/Docker/main/images/lab12.png)
-
-![lab13](https://raw.githubusercontent.com/vottri/Docker/main/images/lab13.png)
-
-![lab14](https://raw.githubusercontent.com/vottri/Docker/main/images/lab14.png)
-
-
-![lab15](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15.png)
 
 
 
-![lab16](https://raw.githubusercontent.com/vottri/Docker/main/images/lab16.png)
 
 
 ![lab17](https://raw.githubusercontent.com/vottri/Docker/main/images/lab17.png)
