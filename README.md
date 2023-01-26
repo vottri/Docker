@@ -410,7 +410,7 @@ docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
 
 Verify the image after the build.
 
-![d25](https://raw.githubusercontent.com/vottri/Docker/main/images/d25.png)
+![d25-1](https://raw.githubusercontent.com/vottri/Docker/main/images/d25-1.png)
 
 ### Create a volume for the custom database container
 
@@ -514,7 +514,7 @@ Remove all containers
 docker rm $(docker ps -aq)
 ```
 
-![lab15-4](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-4.png)
+![lab15-5](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-5.png)
 
 ## 7. Dockercompose <a name="7"></a>
 
@@ -605,6 +605,7 @@ Now that the apps are built and running, we can use normal docker commands to vi
 ```sh
 docker image ls
 ```
+![d31-1](https://raw.githubusercontent.com/vottri/Docker/main/images/d31-1.png)
 
 ```sh
 docker container ls
@@ -617,19 +618,21 @@ docker container ls
 docker network ls
 ```
 
-```sh
-docker volume ls
-```
+![d31-2](https://raw.githubusercontent.com/vottri/Docker/main/images/d31-2.png)
 
-Now, with the web app successfully deployed, you can visit a web browser and access your website at port 10000 to check its content.
+Now, with the web app successfully deployed, you can visit a web browser and access your website at port **10000** to check its content.
 
 ![lab10-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab10-1.png)
 
+As for the custom database container, you can check for the running node exporter by accessing your VM's public IP address at port **9100**.
+
 ![lab12](https://raw.githubusercontent.com/vottri/Docker/main/images/lab12.png)
+
+Or you can use **SQL Server Management Studio (SSMS)** to connect to your custom database container and view its databases.
 
 ![lab16](https://raw.githubusercontent.com/vottri/Docker/main/images/lab16.png)
 
-As the applications are already up, but now you want to bring them down. It is quite simple. To do that, just replace the **up**  with **down** and let Docker Compose handles the rest.
+As you can see, the applications are already up, but now you want to bring them down. To do that, it is quite simple, just replace the **up**  with **down** and let Docker Compose handles the rest.
 
 ```sh
 docker compose down
@@ -637,8 +640,15 @@ docker compose down
 
 ![d32](https://raw.githubusercontent.com/vottri/Docker/main/images/d32.png)
 
-You can check image and container again.
+You can check for images and containers again.
 
+![d32-1](https://raw.githubusercontent.com/vottri/Docker/main/images/d32-1.png)
+
+### Manage apps with Docker Compose
+
+Simulate the change in source code of the web application.
+
+Head over to the web page of the web application.
 
 ![d33](https://raw.githubusercontent.com/vottri/Docker/main/images/d33.png)
 
@@ -646,28 +656,23 @@ Try and modify come contents of the file.
 
 ![d34](https://raw.githubusercontent.com/vottri/Docker/main/images/d34.png)
 
-Only build the wep application again.
+You can use **docker compose build [service/app name]** to only build the wep application again.
+
 ```sh
 docker compose build devops-web
 ```
 
 ![d35](https://raw.githubusercontent.com/vottri/Docker/main/images/d35.png)
 
-Now run docker compose up once more time to bring the web app up.
+Now run docker compose up once more time to bring the apps up.
 
 ![d36](https://raw.githubusercontent.com/vottri/Docker/main/images/d36.png)
 
+List your running containers to see whether your apps are already up.
+
 ![d37](https://raw.githubusercontent.com/vottri/Docker/main/images/d37.png)
 
-
-
-
-
-
-
-
-
-
+Try accessing your website again.
 
 ![lab17](https://raw.githubusercontent.com/vottri/Docker/main/images/lab17.png)
 
