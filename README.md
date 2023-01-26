@@ -249,9 +249,11 @@ You now can list the images you have on your machine.
 docker image ls
 ```
 
+![d13](https://raw.githubusercontent.com/vottri/Docker/main/images/d13.png)
+
 ## 5. Docker containers <a name="5"></a>
 
-Start a container from the mssql image you pulled.
+### Start a container from the mssql image you pulled
 
 ```sh
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" -p 1433:1433 --name mssql-server -d mcr.microsoft.com/mssql/server:2019-CU18-ubuntu-20.04
@@ -267,7 +269,7 @@ docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=E
 
 ![d14](https://raw.githubusercontent.com/vottri/Docker/main/images/d14.png)
 
-List the running containers by using these command.
+List the running containers by using one of these commands.
 
 ```sh
 docker container ls 
@@ -277,7 +279,7 @@ docker ps
 
 ![d15](https://raw.githubusercontent.com/vottri/Docker/main/images/d15.png)
 
-Start web api container
+### Start web api container
 
 ip addr
 
@@ -291,7 +293,7 @@ Verify that web api container is running.
 
 ![d17](https://raw.githubusercontent.com/vottri/Docker/main/images/d17.png)
 
-Start web app container.
+### Start web app container
 
 ```sh
 docker run -e 'WebApi=http://10.0.0.4:10005' --name devopsweb1 -p 10000:80 -d devopsweb:1.0
@@ -303,7 +305,7 @@ Verify that web app container is also running.
 
 ![d19](https://raw.githubusercontent.com/vottri/Docker/main/images/d19.png)
 
-![d13](https://raw.githubusercontent.com/vottri/Docker/main/images/d13.png)
+### Access your containers
 
 Inside **Inbound port rules**, add another rule that allow the VM's port **1433** to be access over the Internet.
 
@@ -343,7 +345,9 @@ Access your VM's Public IP Address over port **10000** to check for connection t
 
 ## 6. Dockerfile <a name="6"></a>
 
-Create a dockerfile for building the custom database image.
+Dockerfile is a plain-text document that tells Docker how to build an app and dependencies into a Docker image. This time, we are going to manually create a Dockerfile ourselves.
+
+### Create a dockerfile for building the custom database image
 
 ```sh
 nano Dockerfile
@@ -372,7 +376,7 @@ CMD ["/bin/bash","-c","./script.sh"]
 USER mssql
 ```
 
-Create a script file that will run when the custom database container starts running.
+Create a script file that will execute when the custom database container starts running.
 
 ```sh
 nano script.sh
@@ -395,7 +399,7 @@ Change permission for the **script.sh** file.
 
 ![d22](https://raw.githubusercontent.com/vottri/Docker/main/images/d22.png)
 
-Build the custom database image.
+### Build the custom database image
 
 ```sh
 docker build -f ./CustomDB/Dockerfile -t customdb:1.0 .
@@ -408,7 +412,7 @@ Verify the image after the build.
 
 ![d25](https://raw.githubusercontent.com/vottri/Docker/main/images/d25.png)
 
-Attach a volume to the custom database container.
+### Create a volume for the custom database container
 
 Volumes are the recommended way to persist data in containers. Persistent data is the data you need to keep. Things like: customer records, financial data, audit logs, ...
 
@@ -427,7 +431,7 @@ mkdir -p mssqlvolume/data
 sudo chown -R 10001 mssqlvolume/
 ```
 
-Start the custom database container.
+### Start the custom database container
 
 ```sh
 docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=zaQ@123456!" -e "MSSQL_PID=Express" --name customdb1 -p 1434:1433 -p 9100:9100 -d -v /home/cloud_user/mssqlvolume/data:/var/opt/mssql/data customdb:1.0
@@ -441,6 +445,8 @@ Verify that the container is running.
 
 ![d28](https://raw.githubusercontent.com/vottri/Docker/main/images/d28.png)
 
+### Access your container
+
 Inside **Inbound port rules**, add another rule that allow the VM's port **1434** and **9100** to be access over the Internet.
 
 ![lab11](https://raw.githubusercontent.com/vottri/Docker/main/images/lab11.png)
@@ -449,7 +455,7 @@ You can check if node exporter is running or not by accessing VM's Public IP Add
 
 ![lab12](https://raw.githubusercontent.com/vottri/Docker/main/images/lab12.png)
 
-Use **SQL Server Management Studio (SSMS)** to connect to your customdb1 container (this time over port 1434).
+Use **SQL Server Management Studio (SSMS)** to connect to your custom database container (this time over port 1434).
 
 ![lab13](https://raw.githubusercontent.com/vottri/Docker/main/images/lab13.png)
 
@@ -459,25 +465,74 @@ Create a Test database.
 
 ![lab15](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15.png)
 
+Check the volume on your Linux machine.
 
-Microsoft SQL Server Management Studio 
+![lab15-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-1.png)
 
+For testing purposes, stop and remove your custom database container.
+
+```sh
 docker container stop customdb1 
 
 docker container rm customdb1
+```
 
-Check the volume again.
+![lab15-2](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-2.png)
 
+Your volume data still exists.
+
+```sh
 ls -la mssqlvolume/data
+```
 
-Start the custom datatbase with a different name but attach the same volume.
+![lab15-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-1.png)
 
+Start a new custom database container but attach the same volume.
+
+![lab15-3](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-3.png)
+
+Check for your old Test database by accessing your newly created container.
+
+![lab15](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15.png)
+
+Note: To start with a clean slate and remove all running Docker containers on your machine, there are a set of handy commands:
+
+List all containers (only IDs)
+
+```sh
+docker ps -aq
+```
+Stop all running containers
+
+```sh
+docker stop $(docker ps -aq)
+```
+
+Remove all containers
+
+```sh
+docker rm $(docker ps -aq)
+```
+
+![lab15-4](https://raw.githubusercontent.com/vottri/Docker/main/images/lab15-4.png)
 
 ## 7. Dockercompose <a name="7"></a>
 
-cd DevOpsRepo/
+Docker Compose lets you describe multi-container applications in a single declarative configuration file, and deploy it with a single command. Once the app is deployed, you can manage its entire lifecycle with a simple set of commands. You can even store and manage the configuration file in a version control system.
 
+### Docker Compose files
+
+Docker Compose uses YAML file to define multi-service applications. The default name for a Docker Compose YAML file is dockercompose.yml. (you can use the -f flag to specify custom filename.)
+
+Create a dockercompose.yml file
+
+```sh
 nano docker-compose.yml
+```
+
+![d29](https://raw.githubusercontent.com/vottri/Docker/main/images/d29.png)
+
+Our specific Docker Compose file
 
 ```sh
 version: "3.8"
@@ -534,6 +589,10 @@ networks:
     name: devops-shared-network
 ```
 
+### Deploy apps with Docker Compose
+
+**Docker compose up** is the most common way to bring up apps. It builds or pulls all required images, creates all required networks and volumes, and then starts all containers.
+
 ```sh
 docker compose up -d
 ```
@@ -541,7 +600,7 @@ docker compose up -d
  
 ![d30](https://raw.githubusercontent.com/vottri/Docker/main/images/d30.png)
 
-Now that the apps are built and running, we can use normal docker commands to view the images, containers, networks, and volumes that Docker Compose created.
+Now that the apps are built and running, we can use normal docker commands to view the images, containers, networks that Docker Compose created.
 
 ```sh
 docker image ls
