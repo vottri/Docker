@@ -48,8 +48,6 @@ Basically, the tasks for you is to build Docker containers:
 
  - must have a volume to store data for backup.
 
-web map port 80 (container) - 10000 (host) api run port 80 (container) - 10005 (host) database port 1433 (container) - 1434 (host)
-
 **1 web api container that connects to the database**
 
  - Web api needs to configure connection string to connect to database:
