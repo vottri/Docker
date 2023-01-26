@@ -20,6 +20,9 @@
 
 **INTRODUCTION**
 
+Container is roughly analogous to the Virtual Machine, and like VMs, containers live on top of a host machine and use its resources, however, instead of virtualising the underlying hardware, they virtualise the host OS. Meaning containers don’t need to have their own OS, making them much more lightweight than VMs, and consequently quicker to spin up. 
+
+Docker is the containerization platform that is used to package your application and all its dependencies together in the form of containers to make sure that your application works seamlessly in any environment which can be developed or tested or in production. Docker is a tool designed to make it easier to create, deploy, and run applications by using containers. 
 
 ===========================================================================
 
@@ -29,37 +32,45 @@ This is intended to help get your feet wet with the basics of Docker by presenti
 
 Basically, the tasks for you is to build Docker containers:
 
-1 database container database 
+**1 database container database**
 
-database sqlserver 2019 ubuntu 
+ - database image: microsoft sqlserver 2019 ubuntu based
 
-sa password: zaQ@123456! 
+ - sa password: zaQ@123456! 
 
-version: express
+ - version: express
 
-has installed node exporter and will automatically run when starting the container
+ - port:
+      - container: 1433
+      - published: 1434
 
-The database container must have a volume to store data for backup.
+ - install node exporter and will automatically run when starting the container
+
+ - must have a volume to store data for backup.
 
 web map port 80 (container) - 10000 (host) api run port 80 (container) - 10005 (host) database port 1433 (container) - 1434 (host)
 
-1 web app container that connects to the database
+**1 web api container that connects to the database**
 
-web app UI needs variable WebApi={ApiUrl}
+ - Web api needs to configure connection string to connect to database:
 
-1 web api 
+   ConnectionStrings__AppDatabase=Server={sqlserverIp};Database=AppDatabase;User Id={user};Password={Password};
+   
+  - port:
+      - container: 80
+      - published: 10005
 
-web api needs to configure connection string to connect to database
+**1 web app container**
 
-ConnectionStrings__AppDatabase=Server={serverIp};Database=AppDatabase;User Id={user};Password={Password};
+ - Web app UI needs to display the web api 
+ 
+   WebApi={ApiUrl}
 
+ - port:
+     - container: 80
+     - published: 10000
 
-
-first use docker command normally, then put in docker compose
-
-
-web app and web api will be dev setup docker file.
-
+First practice using docker command normally to build images and run the containers, then using docker compose to deploy all the apps together.
 
 ===========================================================================
 ## 1. Lab Setup <a name="1"></a>
@@ -253,6 +264,10 @@ docker image ls
 
 ## 5. Docker containers <a name="5"></a>
 
+Check for your Linux machine's internal IP address. Sometimes you may need your host's IP address for your Docker container. For example, you need to be able to connect to the host network from inside a Docker container to access your app or database running locally on the host.
+
+![ip](https://raw.githubusercontent.com/vottri/Docker/main/images/ip.png)
+
 ### Start a container from the mssql image you pulled
 
 ```sh
@@ -280,8 +295,6 @@ docker ps
 ![d15](https://raw.githubusercontent.com/vottri/Docker/main/images/d15.png)
 
 ### Start web api container
-
-ip addr
 
 ```sh
 docker run -e 'ConnectionStrings__AppDatabase=Server=10.0.0.4,1433;Database=AppDatabase;User Id=sa;Password=zaQ@123456!;' --name devopsweb-api-1 -p 10005:80 -d devopsweb-api:1.0
@@ -535,9 +548,9 @@ nano docker-compose.yml
 Our specific Docker Compose file
 
 ```sh
-version: "3.8"
+version: "3.8"    # define the version of the Compose file format (basically the API)
 
-services:
+services:         # define different application microservices.
   devops-web:
     image: devops-web:web-1.0
     build:
@@ -584,7 +597,7 @@ services:
     volumes:
       - /home/cloud_user/mssqlvolume/data:/var/opt/mssql/data
 
-networks:
+networks:         # create new networks.
   default:
     name: devops-shared-network
 ```
