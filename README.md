@@ -75,7 +75,7 @@ First practice using docker command normally to build images and run the contain
 
 Create Azure Linux VM with OS image of **Ubuntu Server 20.04 LTS**. I am going to name this VM **ub01** You can choose the name of VM as you want. 
 
-![lab1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab1.png)
+![lab1-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab1-1.png)
 
 Allow your VM's port **22** (SSH) to be accessible from the Internet.
 
