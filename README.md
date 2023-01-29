@@ -73,6 +73,8 @@ First practice using docker command normally to build images and run the contain
 ===========================================================================
 ## 1. Lab Setup <a name="1"></a>
 
+Login to Azure portal with your Microsoft Azure account.
+
 Create Azure Linux VM with OS image of **Ubuntu Server 20.04 LTS**. I am going to name this VM **ub01** You can choose the name of VM as you want. 
 
 ![lab1-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab1-1.png)
