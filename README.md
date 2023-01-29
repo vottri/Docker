@@ -85,7 +85,7 @@ Use **PuTTY** for connecting to the Linux Virtual Machine. Enter your Linux mach
 
 ![lab3](https://raw.githubusercontent.com/vottri/Docker/main/images/lab3.png)
 
-When you are inside the Linux VMs:
+When you are inside the Linux VM:
 
 ![lab3-1](https://raw.githubusercontent.com/vottri/Docker/main/images/lab3-1.png)
 
